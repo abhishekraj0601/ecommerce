@@ -1,0 +1,80 @@
+<%- include('partials/header.ejs') %>
+<section style="height: 80px; background-color: royalblue;"></section>
+<section id="shoping">
+    <!-- search bar------------------------------- -->
+    <div class="container p-0 border search-bar">
+        <div id="myDropdown" class="dropdown-content">
+            <form action="/search" method="post" class="h-100 bg-dark d-flex">
+                <input type="text" name="search"  placeholder="Search..." id="myInput" onkeyup="filterFunction()" autocomplete="off">
+                <div id="search-content" class="bg-light">
+                    <%search.forEach(function(elem){ %>
+                            <a href="/view/<%=elem._id%>"><%=elem.productname%></a>
+                    <%})%>
+                    <a href="/smartphone" class="d-flex gap-3 align-items-center"> <i class="fa-solid fa-mobile" style="font-size: 18px;"></i> Mobile (<%=smartphone.length%>)</a>
+                    <a href="/laptop" class="d-flex gap-3 align-items-center"> <i class="fa-solid fa-laptop" style="font-size: 18px;"></i> Laptop (<%=laptop.length%>)</a>
+                </div>
+                <button class="btn btn-primary" style="width: 20%; border-radius: 0 ;">search</button>
+            </form>
+        </div>
+    </div>
+    
+
+    <div class="container mt-3 p-0 d-flex justify-content-between" >
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Category
+            </button>
+            <ul class="dropdown-menu">
+                <a href="/smartphone"> <li class="dropdown-item">smart phone (<%=smartphone.length%>)</li></a>
+                <a href="/laptop"> <li class="dropdown-item">laptop (<%=laptop.length%>)</li></a>
+                <a href="/computer"> <li class="dropdown-item">computer (<%=computer.length%>)</li></a>
+            </ul>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              sort
+            </button>
+            <ul class="dropdown-menu">
+                <a href="/shop"> <li class="dropdown-item">sort by default</li></a></li>
+                <a href="#"> <li class="dropdown-item">sort by popularity</li></a></li>
+                <a href="/low"> <li class="dropdown-item">Price : low to high</li></a></li>
+                <a href="/high"> <li class="dropdown-item">Price : high to low</li></a></li>   
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="shoping-result py-3 ">
+        <div class="container">
+            <h6>showing all <%=product.length%> result</h6>
+        </div>
+       <div class="d-flex flex-wrap gap-3 py-3">
+             <% if(product.length > 0){ %>
+                <%product.forEach(function(elem){ %>
+                    <a href="/view/<%=elem._id%>" class="m-auto">
+                        <div class="card1" style="max-width: 250px;">
+                            <!-- <a href="/cart/id" class="card1-a"><i class="fa-solid fa-bag-shopping"></i></a> -->
+                          <div class=" _card1_img" style="height:200px; width:200px;">
+                            <img src="../images/uploads/<%=elem.photo[0].filename%>" alt="" class="img">
+                          </div>
+                          <div class="_card1_h4 text-dark"><%=elem.productname%></div>
+                          <div class="_card1_h5">from <%=elem.price%></div>
+                          <div class="_card1_h6 text-dark text-muted"><%=elem.brand%> & more</div>
+                        </div>
+                    </a>
+                   
+                <%})%>
+            <% }else{ %>
+                <div class="container p-0 d-flex justify-content-center flex-column align-items-center py-4">
+                    <img src="../images/no-found-symbol-unsuccessful-search-vecotr-upset-magnifying-glass-cute-not-zoom-icon-suitable-results-oops-page-failure-122786031.jpg" alt="" style="width: 400px; ">
+                    <h5>oop's  No result found</h5>
+                </div>
+             <% } %>
+                  
+       </div>
+    </div>
+</section>
+
+
+   
+<%- include('partials/footer.ejs') %>

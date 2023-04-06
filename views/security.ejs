@@ -1,0 +1,86 @@
+<%- include('partials/header.ejs') %>
+<section style="height: 80px; background: royalblue;"></section>
+<section id="account">
+    <div class="account-left ">
+        <div class="profile d-flex bg-white p-2 gap-3 align-items-center" >
+            <img src="../images/uploads/<%=user.photo%>" alt="" style="height: 50px; width: 50px; border-radius: 50%;">
+            <div style=" overflow: hidden;">
+                <h6><%=user.fullname%></h6>
+                <h5 style="text-overflow: ellipsis; overflow: hidden;"><%=user.username%></h5>
+            </div>
+        </div>
+    
+        <div class="account-head border-bottom bg-white mt-2 d-flex flex-column ">
+            <h5 class="text-muted d-flex align-items-center gap-4 m-3"> <i class="fa-solid fa-user text-primary"></i> account setting</h5>
+            <div class="d-flex flex-column m-0 p-0" >
+                <a href="/account" class="py-2 px-5 dropdown-item " >
+                    profile information
+                </a>
+                <a href="/address" class="p-2 px-5 dropdown-item" >
+                    manage address
+                </a>
+                <a href="/security" class="p-2 px-5 dropdown-item text-primary"  style="background: rgb(240, 251, 255); font-weight: 700;">
+                    security & password
+                </a>
+            </div>
+        </div>
+        
+        <div class="border-bottom bg-white p-3">
+            <a href="/logout" class="d-flex align-items-center gap-4"><i class="fa-solid fa-right-from-bracket" style="font-size: 20px;"></i> <h5 class="text-muted">logout</h5></a>
+        </div>
+    
+      </div>
+    
+    
+    
+
+  <div class="account-right border p-4">
+    <div>
+       
+        <form action="/changepassword" method="post"  >
+            
+            <div class="d-flex flex-column">
+                <div class="form-group d-flex gap-2 align-items-center">
+                    <label for="password"><i class="fa-solid fa-lock"></i></label>
+                    <input type="password" name="oldpassword" id="" class="password " placeholder="ENter Old password" required>
+                </div> <br>
+                <div class="form-group d-flex gap-2 align-items-center">
+                    <label for="password"><i class="fa-solid fa-lock"></i></label>
+                    <input type="password" name="newpassword" id="" class="password" placeholder="ENter new password" required>
+                </div><br>
+                <div class="form-group d-flex gap-2 align-items-center">
+                    <label for="password"><i class="fa-solid fa-lock"></i></label>
+                    <input type="password" name="confirmpassword" id="" class="password" placeholder="confirm password" required>
+                </div>
+            </div>
+            <button class="btn btn-primary mt-5">change password</button>
+        </form>
+    </div>
+    <div class="mt-5 faqs">
+        <h5 class="my-4">FAQS</h5>
+        <div>
+            <h6>What happens when I update my email address (or mobile number)?</h6>
+            <p>Your login email id (or mobile number) changes, likewise. You'll receive all your account related communication on your updated email address (or mobile number).</p>
+        </div>
+        <div>
+            <h6>When will my Flipkart account be updated with the new email address (or mobile number)?</h6>
+            <p>It happens as soon as you confirm the verification code sent to your email (or mobile) and save the changes.</p>
+        </div>
+        <div>
+            <h6>What happens to my existing Flipkart account when I update my email address (or mobile number)?</h6>
+            <p>Updating your email address (or mobile number) doesn't invalidate your account. Your account remains fully functional. You'll continue seeing your Order history, saved information and personal details.</p>
+        </div>
+        <div>
+            <h6>Does my Seller account get affected when I update my email address?</h6>
+            <p>Flipkart has a 'single sign-on' policy. Any changes will reflect in your Seller account also.</p>
+        </div>
+
+<br>
+        <a href="/delete" >Deactivate Account</a>
+    </div>
+  </div>
+
+</section>
+
+
+<%- include('partials/footer.ejs') %>

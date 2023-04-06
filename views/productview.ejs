@@ -1,0 +1,319 @@
+<%- include('partials/header.ejs') %>
+<section style="height: 80px; background-color: royalblue;"></section>
+<section id="productview" >
+    <div class=" productview d-flex">
+        <div class="productview-left">
+          <div id="carouselExampleIndicators" class="carousel slide "  data-bs-ride="true">
+            
+            <div class="carousel-inner w-100" style="height: 400px;">
+              <!-- <div class="carousel-item active">
+                <img src="../images/uploads/<%=product.photo[0].filename%>" class="d-block " alt="...">
+              </div> -->
+              <%product.photo.forEach(function(elem){%>
+                <div class="carousel-item active">
+                  <img src="../images/uploads/<%=elem.filename%>" class="d-block m-auto" alt="...">
+                </div>
+                <% })%>
+              
+            </div>
+            <%if(product.photo.length >1){%>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" style=" background-color: rgba(0, 0, 0, 0.505); border-radius: 2px;" aria-hidden="true"></span>
+                <span class="visually-hidden ">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true" style=" background-color: rgba(0, 0, 0, 0.505); border-radius: 2px;"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+           <% }%>
+          
+        </div>
+            <div class=" d-flex gap-2 mt-3">
+            <% if(user){ %>
+              <a href="/cart/<%=product._id%>" class="w-50 "> <button class="btn text-white <%=user.cart.indexOf(product._id) == -1 ? 'btn-warning' :'btn-danger' %> w-100  p-3"><i class="fa-solid fa-cart-plus"></i> <%=user.cart.indexOf(product._id) == -1 ? 'ADD TO CART' :'REMOVE FROM CART' %></button></a>
+              <button class="btn btn-primary add-btn w-50 p-3"> <i class="fa-solid fa-bolt-lightning"></i> BUY NOW</button>
+            <% }else{ %>
+              <a href="/cart/<%=product._id%>" class="w-50"> <button class="btn text-white btn-warning w-100  p-3"><i class="fa-solid fa-cart-plus"></i> ADD TO CART</button></a>
+              <a href="/buy" class="w-50"><button class="btn btn-primary  w-100 p-3"> <i class="fa-solid fa-bolt-lightning"></i> BUY NOW</button></a>
+            <% } %>
+            </div>
+        </div>
+        <div class="productview-right p-5">
+
+          <h4><%=product.productname%></h4>
+          <p class="text-danger" style="font-size: 20px;"><span style="font-size: 25px; " >$</span> <%=product.price%></p>
+          <p class="m-0"><strong>Brand : </strong><%=product.brand%></p>
+          <p class="m-0"><strong>category : </strong><%=product.category%></p>
+          <p class="m-0"><strong>sailer : </strong><%=product.username%></p>
+
+          <hr>
+          <div class="reviews mt-3 border p-1" style="border-radius: 10px;" >
+            <strong>Customer reviews</strong>
+            <form action="/review/<%=product._id%>" method="post" class="d-flex bg-light gap-1 mt-2 border flex-column p-1">
+              <textarea name="review" id="" placeholder="Share Your Reviews Here..." cols="0" rows="0" class="m-0 h-100 p-1 border reviewtext"></textarea>
+              <button class="btn btn-secondary reviewbtn">submit</button>
+            </form>
+            <small class="text-muted">total <%=product.reviewid.length%> review here</small>
+
+           <div style="max-height: 300px; overflow: auto;">     
+           
+            <%product.reviewid.forEach((elem)=>{ %>
+            <div style="position: relative; border-radius: 10px;" class="bg-light review border d-flex gap-4 mt-2 px-1 align-items-center">
+              <img src="../images/uploads/<%=elem.userid[0].photo%>" style="width: 50px; height: 50px; border-radius: 50%; " class="p-1 border" alt="">
+              <div>
+                <strong class="m-0"><%=elem.userid[0].fullname%> </strong>
+                <p class="m-0"><%=elem.review%></p>
+                <small class="text-muted m-0 " style="font-size: 12px;"><%=elem.createdAt%></small>
+              </div>
+             <%if(user){%>
+              <% if(user.review.indexOf(elem._id) == -1){%>
+                <% }else{%>
+                 <a href="/reviewdelete/<%=product._id%>/<%=elem._id%>" class="reviewdelete text-danger" style="position: absolute; top: 2%; right: 1%; "><i class="fa-solid fa-trash"></i></a>
+                <%}%>          
+            <% }%>
+             
+            </div>
+            <% })%>
+           </div>
+          </div>
+          
+        </div>
+    </div>
+    <input type="text" value="<%=product.price%>" style="display: none;" id="productprice" >
+
+</section>
+
+<section id="proaddress" style="overflow: auto; width: 100vw; z-index: 9999;  min-height: 100vh; display: none; align-items: center; justify-content: center; position: fixed; left: 0; top: 0; background-color: rgba(0, 0, 0, 0.45);">
+  <div style=" width: 70%; position: relative; background: white; border-radius: 10px;" class="p-4 proaddress">
+    <h5 class="text-center">delivery address</h5>
+<% if(user){%>
+    <form action="/buy/<%=product._id%>" method="post" id="myForm" class="d-flex flex-wrap mt-4 gap-3">
+      <% if(user.address.length >0){ %>
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="text" name="username" value="<%=user.address[0].username%>" id="" placeholder="name" required>
+      </div>
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="text" name="flate" id="" value="<%=user.address[0].flate_no%>"  placeholder="flate number" required>
+      </div>
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="text" name="area" id="" value="<%=user.address[0].area%>"  placeholder="area" required>
+      </div>
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="text" name="city" id="" value="<%=user.address[0].city%>"  placeholder="city" required>
+      </div>
+      
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="text" name="state" id="" value="<%=user.address[0].state%>"  placeholder="state" required>
+      </div>
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="text" name="country" id=""  value="<%=user.address[0].country%>" placeholder="country" required>
+      </div>
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="tel" name="number" id="" value="<%=user.address[0].number%>"  placeholder="Mobile Number" required inputmode="numeric" >
+      </div>
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="number" name="pincode" id="" value="<%=user.address[0].pincode%>" placeholder="pincode" required inputmode="numeric">
+      </div>
+      <% }else{ %>
+        <div class="form-group d-flex align-items-center m-auto">
+          <input type="text" name="username" id="" placeholder="name" required>
+        </div>
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="text" name="flate" id="" placeholder="flate number" required>
+      </div>
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="text" name="area" id="" placeholder="area" required>
+      </div>
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="text" name="city" id="" placeholder="city" required>
+      </div>
+      
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="text" name="state" id="" placeholder="state" required>
+      </div>
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="text" name="country" id="" placeholder="country" required>
+      </div>
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="tel" name="number" id="" placeholder="Mobile Number" required>
+      </div>
+      <div class="form-group d-flex align-items-center m-auto">
+          <input type="number" name="pincode" id="" placeholder="pincode" required>
+      </div>
+      <%} %>
+
+      <hr style="width: 100%; opacity: 1; " class="m-0 mt-4">
+
+      <div id="payment" class="px-4 p-0 mt-3 d-flex flex-wrap gap-5 w-100">
+        <h5 style="margin-bottom: 10px;">payment method</h5>
+        <div class="form-check d-flex gap-3 align-items-center">
+          <input class="form-check-input"  type="radio" name="paymentType" value="direct" id="flexRadioDefault1" onchange="hide()">
+          <label class="form-check-label" style="font-size: 15px;" for="flexRadioDefault1">
+            Cash On Delivery
+          </label>
+        </div>
+        <div class="form-check d-flex gap-3 align-items-center">
+          <input class="form-check-input"  type="radio" name="paymentType" value="online" id="flexRadioDefault2" onchange="show()">
+          <label class="form-check-label" style="font-size: 15px;" for="flexRadioDefault2">
+            Online
+          </label>
+        </div>
+      </div>
+      
+      <div class="w-100 px-2  d-flex align-items-center justify-content-end">
+          <input type="submit" class="btn btn-primary" value="BUY NOW">
+          <button class="btn btn-primary" type="button" id="rzp-button1" style="display: none;  ">BUY NOW</button>
+
+      </div>
+  </form>
+  
+
+<% }%>
+      <button class="btn btn-danger add-close" style="position: absolute; right: 0; top:0;"><i class="fa-solid fa-x"></i></button>
+  </div>
+</section>
+
+<section id="paymentdiv" style=" width: 100vw; z-index: 99990;  min-height: 100vh; display: none; align-items: center; justify-content: center; position: fixed; left: 0; top: 0; background-color: rgba(0, 0, 0, 0.45);">
+  <div class="d-flex align-items-center justify-content-center bg-light p-5 flex-column" style="border-radius: 10px; min-width: 300px;">
+    <div class="success-animation ">
+      <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" /><path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" /></svg>
+    </div>
+    <h1 class="mt-3 text-success">success</h1>
+    <small>PLEASE WAIT !</small>
+    <small class="text-muted">Don't Close OR Refresh The Window</small>
+  </div>
+</section>
+<!-- -------------------------------------scripts -->
+
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+<script>
+
+function show() {
+  document.getElementById("rzp-button1").style.display="block"
+  document.querySelector('input[type="submit"]').style.display="none";
+}
+function hide() {
+  document.getElementById("rzp-button1").style.display="none"
+  document.querySelector('input[type="submit"]').style.display="block";
+
+}
+
+
+const form = document.getElementById('myForm');
+form.addEventListener('submit', event => {
+  event.preventDefault(); // Prevent default form submission behavior
+
+  const paymentType = document.querySelector('input[name="paymentType"]:checked').value;
+  if (paymentType === 'online') {
+  } else {
+    // Submit form normally
+
+    form.submit();
+  }
+});
+
+  // -----------------------------------------------
+  var address = document.querySelector("#proaddress")
+  document.querySelector(".add-btn").addEventListener("click",function(){
+    address.style.display="flex"
+  })
+  document.querySelector(".add-close").addEventListener("click",function(){
+    address.style.display="none"
+  })
+
+var productprice = document.getElementById("productprice").value
+
+  var orderId ;
+$(document).ready(function(){
+    var settings = {
+  "url": `/create/orderId/${productprice}`,
+  "method": "POST",
+  "timeout": 0,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "data": JSON.stringify({
+    "amount": "50000"
+  }),
+};
+
+//creates new orderId everytime
+$.ajax(settings).done(function (response) {
+  // console.log(response.amount)
+  // price=response.amount;
+  // console.log(price)
+  orderId=respons.Id;
+  $("button").show();
+});
+});
+
+var options = {
+    "key": "rzp_test_kNNGbyOiNhCZYG", // Enter the Key ID generated from the Dashboard
+    "amount": "500" * "100", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "currency": "INR",
+    "name": "Quick Sell",
+    "description": "Test Transaction",
+    "image": "https://images-platform.99static.com/q5tfyKaM7zL55nUeXfQm-oq6_sk=/96x96:864x864/500x500/top/smart/99designs-contests-attachments/78/78273/attachment_78273829",
+    "order_id": orderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "handler": function (response){
+        // alert(response.razorpay_payment_id);
+        // alert(response.razorpay_order_id);
+        // alert(response.razorpay_signature);
+
+        var settings = {
+  "url": "/api/payment/verify",
+  "method": "POST",
+  "timeout": 0,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "data": JSON.stringify({response}),
+}
+
+$.ajax(settings).done((req,res)=>{
+  if(signatureIsValid=true){
+    // alert("Payment successful PLEASE WAIT ! Please do not refress the page");
+    document.getElementById("paymentdiv").style.display="flex"
+    document.getElementById("flexRadioDefault1").disabled = true;  
+    // document.querySelector(".success-animation").style.display="flex";
+    // document.getElementById("rzp-button1").textContent ="PLEASE WAIT";
+    // document.getElementById("rzp-button1").disabled = true;
+    // document.getElementById("rzp-button1").classList.add("btn-warning")
+    // document.getElementById("rzp-button1").classList.remove("btn-primary")
+    form.submit();
+  }else{
+    alert("payment failed")
+  }
+})
+    },
+    "prefill": {
+        "name": "Gaurav Kumar",
+        "email": "gaurav.kumar@example.com",
+        "contact": "9000090000"
+    },
+    "notes": {
+        "address": "Quick Sell Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+});
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+</script>
+   
+<%- include('partials/footer.ejs') %>

@@ -1,0 +1,136 @@
+
+body{
+    text-transform: capitalize;
+}
+#form{
+    width: 100%;
+    position: relative;
+    height: auto;
+    padding: 50px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+}
+
+.close{
+    position: absolute;
+    right: 5%;
+    top: 5%;
+    
+}
+#login{
+    width: 75%;
+    height: 80vh;
+    display: flex;
+    overflow: hidden;
+    box-shadow: 0 0 30px #d4d4d4;
+
+    /* background-color: #fff; */
+    border-radius: 10px;
+}
+#login .login-left {
+    width: 50%;
+    height: 100%;
+    
+}
+.login-right{
+    width: 50%;
+}
+#form form input{
+    width: 90%;
+    border: none;
+    border-bottom: 1px solid rgb(182, 182, 182);
+    outline: none;
+    padding: 10px ;
+}
+#form form input:focus{
+    border-color: black;
+}
+#form button{
+    border: none;
+    background-color: blue;
+    color: #fff;
+    padding: 13px 30px;
+    width: fit-content;
+    border-radius: 10px;
+    opacity: .6;
+}
+#form button:hover{
+    opacity: 1;
+}
+#form button:active{
+    opacity: .6;
+}
+.anchor a{
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border-radius: 5px;
+    color: #fff;
+    height: 30px;
+}
+.forget{
+    text-decoration: none;
+    color: rgb(128, 128, 128);
+}
+.forget:hover{
+    color: blue;
+}
+.login-left a ,.signup-left a{
+    color: rgb(108, 108, 108);
+}
+.login-left a:hover ,.signup-left a:hover{
+    color: blue;
+}
+
+/* ---------------------------- */
+#signup{
+    width: 75%;
+    height: 80vh;
+    display: none;
+    overflow: hidden;
+    box-shadow: 0 0 30px #d4d4d4;
+    /* background-color: #fff; */
+    border-radius: 10px;
+}
+.signup-right{
+    width: 50%;
+}
+
+/* -------------------------responsive */
+@media screen and (max-width: 800px) {
+    #form{
+        height: auto;
+    }
+    #form form input{
+        width: 100%;
+    }
+#login{
+    width: 90%;
+    padding: 0 0 30px 0;
+    justify-content: center;
+    height: fit-content;
+    align-items: center;
+    text-align: center;
+    flex-direction: column-reverse;
+}
+#signup{
+    width: 90%;
+    padding: 50px 0;
+    justify-content: center;
+    height: fit-content;
+    align-items: center;
+    flex-direction:column;
+}
+
+.login-left img  ,.signup-left img{
+    display: none;
+}
+.login-right ,.signup-right {
+    width: 90%;
+}
+
+}
