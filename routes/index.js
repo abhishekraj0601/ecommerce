@@ -247,6 +247,7 @@ router.post("/buy/:id",isLoggedin,function(req,res,next){
     order.userotp =x
     product.orderId.push(order._id)
     order.address.push(address)
+    loginuser.address.push(address)
     loginuser.buyed.push(order._id)
     await order.save()
     await product.save()
@@ -592,10 +593,10 @@ router.get("/delete/:userid",async function(req,res){
 
 router.get("/deleteorder/:orderid/:productid",async function(req,res){
 var user =await userModel.findOne({username:req.session.passport.user})
-var order = await orderModel.findOne({_id:req.params.orderid})
 var product = await productModel.findOne({_id:req.params.productid})
-product.orderId.splice(product.orderId.indexOf(req.params.productid))
-user.buyed.splice(user.buyed.indexOf(req.params.orderid))
+var order = await orderModel.findOneAndDelete({_id:req.params.orderid})
+product.orderId.splice(product.orderId.indexOf(req.params.productid),1)
+user.buyed.splice(user.buyed.indexOf(req.params.orderid),1)
 await user.save()
 await product.save()
 var email = "codecrushers01@gmail.com";

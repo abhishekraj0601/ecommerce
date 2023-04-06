@@ -33,7 +33,7 @@
                         <%if(elem.deliverystatus !== "deliverd"){%>
                             <div class="border">
                                 <form action="/userverify/<%=elem._id%>/<%=elem.userid[0]._id%>/<%=product._id%>" method="post" class="mt-4 d-flex flex-column gap-2 px-3">
-                                    <input type="number" required name="orderotp" placeholder="enter otp">
+                                    <input type="text" required name="orderotp" maxlength="6" minlength="6" placeholder="enter 6 digit otp">
                                     <button class="btn btn-secondary">submit</button>
                                     <button class="btn btn-link orderotp" type="button" >Resend Otp</button>
 
