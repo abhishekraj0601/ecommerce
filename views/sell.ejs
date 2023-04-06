@@ -66,22 +66,25 @@
 
   <div class="container border mt-2 bg-white d-flex flex-wrap">
 <%product.forEach(function(elem){%>
-  <div class="card m-auto" style="width: 18rem;">
-    <img src="../images/uploads/<%=elem.photo[0].filename%>" class="card-img-top" style="width: 16rem; max-height: 300px;" alt="...">
-    <div class="card-body">
-      <h6 class="card-title">PRODUCT NAME : <%=elem.productname%></h6>
-      <h6 class="card-title">PRICE : <%=elem.price%></h6>
-      <h6 class="card-title">BRAND :  <%=elem.brand%></h6>
-
-      <h6 class="card-title"> CATEGORY : <%=elem.category%></h6>
-
-      <div class="d-flex gap-2">
-        <a href="/productedit/<%=elem._id%>" class="btn btn-warning w-50">EDIT INFO</a>
-        <a href="/productdelete/<%=elem._id%>" class="btn btn-danger w-50">DELETE</a>
-
+  
+    <div class="card m-auto p-3" style="width: 18rem;">
+      <img src="../images/uploads/<%=elem.photo[0].filename%>" class="card-img-top" style="width: 16rem; max-height: 300px;" alt="...">
+      <div class="card-body  px-0">
+        <h6 class="card-title">PRODUCT NAME : <%=elem.productname%></h6>
+        <h6 class="card-title">PRICE : <%=elem.price%></h6>
+        <h6 class="card-title">BRAND :  <%=elem.brand%></h6>
+  
+        <h6 class="card-title"> CATEGORY : <%=elem.category%></h6>
+  
+        <div class="d-flex gap-2">
+          <a href="/productedit/<%=elem._id%>" class="btn btn-warning w-50">EDIT INFO</a>
+          <a href="/productdelete/<%=elem._id%>" class="btn btn-danger w-50">DELETE</a>
+  
+        </div>
       </div>
+     <a href="/sell/view/<%=elem._id%>"><button class="btn btn-secondary w-100">order requset : <%=elem.orderId.length%></button></a> 
     </div>
-  </div>
+
 <%})%>
   </div>
 </section>

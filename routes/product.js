@@ -10,7 +10,7 @@ var propertySchema = mongoose.Schema({
       type:Array,
       default:[]
     },
-    
+    orderId:[{type: mongoose.Schema.Types.ObjectId, ref:'order'}],
     username:String,
     productname:String,
     category:String,

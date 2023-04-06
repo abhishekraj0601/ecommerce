@@ -20,8 +20,6 @@ var userSchema = new mongoose.Schema({
     type:String,
     require:true
   },
-  facebook_id:String,
-  google_id:String,
   gender:String,
   password:{
     type:String,

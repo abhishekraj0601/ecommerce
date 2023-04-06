@@ -6,7 +6,10 @@ var orderSchema = mongoose.Schema({
         type:Array,
         default:[]
     },
-    payment:String,
+    paymentmode:String,
+    paymentstatus:String,
+    userotp:String,
+    deliverystatus:String,
     productid: [{ type: mongoose.Schema.Types.ObjectId, ref: 'product' }],
     userid: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }]
     },{

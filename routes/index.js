@@ -27,11 +27,14 @@ passport.use(new GoogleStrategy({
   clientID: process.env['GOOGLE_CLIENT_ID'],
   clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
   callbackURL: '/oauth2/redirect/google',
-  scope: [ 'email' ]
+  scope: [ 'email','profile' ]
 }, function verify(issuer, profile, cb) {
  console.log(profile)
 }));
-
+router.get('/oauth2/redirect/google', passport.authenticate('google', {
+  successRedirect: '/',
+  failureRedirect: '/login'
+}));
 // ------------------------------------------------------------------------------------
 var instance = new Razorpay({
   key_id: 'rzp_test_kNNGbyOiNhCZYG',
@@ -104,13 +107,24 @@ router.get('/', function(req, res, next) {
       res.render('index', {user: req.user, isLoggedIn: req.isLogged ,product ,title:"home"});
   })
 });
-
-
-router.get("/check/:username",async function(req,res){
- var user = await userModel.findOne({$or:[{"email":req.params.username},{"username":req.params.username},{"mobilenumber":req.params.username}]})
+router.get("/buy",isLoggedin ,function(req,res){
+  res.redirect("back")
+})
+// ------------------axios
+router.get("/checkusername/:username",async function(req,res){
+ var user = await userModel.findOne({username:req.params.username})
 res.json(user)
 })
+router.get("/check/:username",async function(req,res){
+ var user = await userModel.findOne({$or:[{"username":req.params.username},{"email":req.params.username},{"number":req.params.username}]})
+res.json(user)
+})
+router.get("/checkemail/:email",async function(req,res){
+  var user = await userModel.findOne({email:req.params.email})
+ res.json(user)
+ })
 
+//  -------------------------------------
 router.get('/account',isLoggedin, function(req, res, next) {
   userModel.findOne({username:req.session.passport.user}).then(function(loginuser){
     res.render('account', {user: req.user, isLoggedIn: req.isLogged,title:"account" ,loginuser});
@@ -190,9 +204,19 @@ router.get("/order",isLoggedin,function(req,res,next){
   })
 })
 
-
-
-
+router.post("/userverify/:orderid/:userid/:productid",async function(req,res){
+  var user = await userModel.findOne({_id:req.params.userid})
+  var order = await orderModel.findOne({_id:req.params.orderid})
+  var product = await productModel.findOne({_id:req.params.productid})
+  if (order.userotp === req.body.orderotp) {
+    order.deliverystatus ="deliverd";
+    order.paymentstatus ="Success"
+    await order.save()
+    res.redirect("back")
+  }else{
+    res.send("not match")
+  }
+})
 
 router.post("/buy/:id",isLoggedin,function(req,res,next){
   userModel.findOne({username:req.session.passport.user}).then(function(loginuser){
@@ -208,17 +232,30 @@ router.post("/buy/:id",isLoggedin,function(req,res,next){
       number:req.body.number
     }
     orderModel.create({
-    payment:req.body.paymentType,
+    paymentmode:req.body.paymentType,
     productid:req.params.id,
     userid:loginuser._id
   }).then(async function(order){
+    var x =Math.random().toString().substr(2, 6); //6digit otp
+    var product = await productModel.findOne({_id:req.params.id})
+    if(req.body.paymentType === "cod"){
+      order.paymentstatus ="Pending"
+    }else{
+      order.paymentstatus ="Success"
+    }
+    order.deliverystatus ="approved"
+    order.userotp =x
+    product.orderId.push(order._id)
     order.address.push(address)
     loginuser.buyed.push(order._id)
     await order.save()
+    await product.save()
     await loginuser.save()
-    var email = "codecrushers01@gmail.com";
-    var html = ` <h5>ORDER ID : ${order._id}</h5>`;
-    var subject = "order request"
+    var email = loginuser.email;
+    var html = `<p><strong>congratulation your order with </strong></p> <h5>ORDER ID : ${order._id}</h5>
+    <p>has been confirmed <br> please note down otp and confirm at the time of delivey <strong>${x}</strong></p>
+    `;
+    var subject = "order confirmation"
     // -------
     nodemailer(email,subject,html).then(function(){
       res.redirect("/order")
@@ -356,7 +393,16 @@ router.post("/sell",upload.array('filename', 5),function(req,res){
    
 })
 
-
+router.get("/sell/view/:id",function(req,res){
+  productModel.findOne({_id:req.params.id}).populate({
+    path:"orderId",
+    populate: {
+      path: "userid" // in blogs, populate comments
+  }
+  }).then(function(product){
+    res.render("sellview",{product})
+  })
+})
 
 // ------------------------------------------------
 router.post("/search",async function(req,res){
@@ -468,6 +514,21 @@ router.get("/resendotp/:userid",async function(req,res) {
       res.json("otp sent")
     })
 })
+router.get("/orderotp/:orderid/:userid",async function(req,res) {
+  var order = await orderModel.findOne({_id:req.params.orderid})
+ var user = await userModel.findOne({_id:req.params.userid})
+    var x =Math.random().toString().substr(2, 6); //6digit otp
+    order.userotp = x;
+    await order.save()
+    // --------nodemailer file
+    var email = user.email;
+    var html = ` <p> order cnfermation otp is </p><h2> ${x} </h2>`;
+    var subject = "order verification otp"
+    // -------
+    nodemailer(email,subject,html).then(function(){
+      res.json("otp sent")
+    })
+})
 // -----------------register-------------------
 
 router.post("/register",async function(req,res){
@@ -529,21 +590,23 @@ router.get("/delete/:userid",async function(req,res){
  res.redirect("back")
 })
 
-router.get("/deleteorder/:id", function(req,res){
- userModel.findOne({username:req.session.passport.user}).then(function(loginuser){
-  orderModel.findOneAndDelete({_id:req.params.id}).then(function(user){
-    loginuser.buyed.splice(loginuser.buyed.indexOf(req.params.id),1)
-    loginuser.save().then(function(){
-      var email = "codecrushers01@gmail.com";
-    var html = ` <h5>ORDER ID : ${req.params.id}</h5>`;
-    var subject = "order cencle"
-    // -------
-    nodemailer(email,subject,html).then(function(){
-      res.redirect("back")
-    })
-    })
-  })
- })
+router.get("/deleteorder/:orderid/:productid",async function(req,res){
+var user =await userModel.findOne({username:req.session.passport.user})
+var order = await orderModel.findOne({_id:req.params.orderid})
+var product = await productModel.findOne({_id:req.params.productid})
+product.orderId.splice(product.orderId.indexOf(req.params.productid))
+user.buyed.splice(user.buyed.indexOf(req.params.orderid))
+await user.save()
+await product.save()
+var email = "codecrushers01@gmail.com";
+var html = ` <h5>ORDER ID : ${req.params.id}</h5>`;
+var subject = "order cencle"
+// -------
+nodemailer(email,subject,html).then(function(){
+  res.redirect("back")
+})
+
+ 
 })
 
 router.get("/reviewdelete/:productid/:id",async function(req,res){

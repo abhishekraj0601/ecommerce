@@ -54,9 +54,12 @@
                         </div>
                         <small class="mx-3 m-0 username-suggestion" style="position: absolute; font-size: 11px;display: none;"></small>
                     </div>
-                    <div class="form-group d-flex align-items-center">
-                        <label for="name"><i class="fa-solid fa-envelope"></i></label>
-                        <input type="text" name="email" id="" placeholder="Email" required>
+                    <div class="form-group " style="position: relative;">
+                        <div class="d-flex align-items-center">
+                            <label for="username"><i class="fa-solid fa-envelope"></i></label>
+                            <input type="text" name="email" class="useremail" placeholder="Email" required>
+                        </div>
+                        <small class="mx-3 m-0 email-suggestion" style="position: absolute; font-size: 11px; display: none;"></small>
                     </div>
                     <div class="form-group d-flex align-items-center">
                         <label for="name"><i class="fa-solid fa-user"></i></label>
@@ -102,15 +105,15 @@ function myFunction() {
  document.querySelector(".usernum").addEventListener("change",function(){
         var small = document.querySelector(".username-suggestion")
        if(this.value.trim().length >0){
-        axios.get(`/check/${this.value}`).then(function(res){
+        axios.get(`/checkusername/${this.value}`).then(function(res){
             if (res.data == null) {
                 small.style.display="block"
                 small.style.color="green";
-                small.textContent = "this user name is available."
+                small.textContent = "user name available."
             }else{
                 small.style.display="block"
                 small.style.color="red";
-                small.textContent = "this user name is already taken."
+                small.textContent = "user name is already taken."
 
             }
         })
@@ -118,10 +121,31 @@ function myFunction() {
         small.style.display="none"
        }
 })
+
+document.querySelector(".useremail").addEventListener("change",function(){
+        var small = document.querySelector(".email-suggestion")
+       if(this.value.trim().length >0){
+        axios.get(`/checkemail/${this.value}`).then(function(res){
+            if (res.data == null) {
+                small.style.display="block"
+                small.style.color="green";
+                small.textContent = "available."
+            }else{
+                small.style.display="block"
+                small.style.color="red";
+                small.textContent = "this email is registered."
+
+            }
+        })
+       }else{
+        small.style.display="none"
+       }
+})
+
 document.querySelector(".usernum1").addEventListener("change",function(){
         var small = document.querySelector(".username-suggestion1")
        if(this.value.trim().length >0){
-        axios.get(`/check/${this.value}`).then(function(res){
+        axios.get(`/checkusername/${this.value}`).then(function(res){
             if (res.data == null) {
                 small.style.display="block"
                 small.style.color="red";

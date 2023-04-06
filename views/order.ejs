@@ -13,7 +13,7 @@
                 <div>
                   <a href="/view/<%=elem.productid[0]._id%>" class="_card1_h4  m-0 text-primary" ><%=elem.productid[0].productname%></a>
                   <div class="_card1_h4 text-dark"></div>
-                  <div class="_card1_h5"><%=elem.productid[0].price%></div>
+                  <div class="_card1_h5 text-danger">$ <%=elem.productid[0].price%></div>
                   <div class="_card1_h6 text-dark text-muted"><%=elem.productid[0].brand%> </div>
                   <p class="m-0"><strong>seller : </strong> <%=elem.productid[0].username%></p>
                 </div>
@@ -24,13 +24,18 @@
                   </div>
                   <p class="m-0"><strong>phone number :</strong> <%=elem.address[0].number%></p>
                   <div class="d-flex gap-5">
-                    <p class="m-0"><strong>payment mode :</strong> <%=elem.payment === "direct" ? 'Cash On Delivery' :'Online Pyment'%></p>
-                    <p class="m-0"><strong>payment status :</strong><span class="<%=elem.payment === 'direct' ? 'text-danger' :'text-success'%>">
-                     <%=elem.payment === "direct" ? 'pending' :'success'%>
+                    <p class="m-0"><strong>payment mode :</strong> <%=elem.paymentmode%></p>
+                    <p class="m-0"><strong>payment status :</strong><span class="<%=elem.paymentstatus == 'Success' ? 'text-success' :'text-danger'%>">
+                      <%=elem.paymentstatus%>
                     </span></p>
+                    <p><strong>order status : </strong> <%= elem.deliverystatus%> </p>
+
                   </div>
+                 
                 </div>
-                 <a href="/deleteorder/<%=elem._id%>" style="position: absolute; right:2%; bottom: 10%;" class="text-danger">cencle order</a>
+                <%if(elem.deliverystatus !== 'deliverd'){%>
+                  <a href="/deleteorder/<%=elem._id%>/<%=elem.productid[0]._id%>" style="position: absolute; right:2%; bottom: 10%;" class="text-danger">cencle order</a>
+                <%}%>
             </div>
         </div>
        
