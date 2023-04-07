@@ -146,14 +146,28 @@
         </div>
 
 <br>
-        <a href="/delete/<%=user._id%>" >Deactivate Account</a>
+        <!-- <a href="/delete/<%=user._id%>" >Deactivate Account</a> -->
+        <button class="btn btn-danger deactivate">Deactivate Account</button>
+        <input type="text" value="<%=user._id%>" id="userid" style="display: none;" >
     </div>
   </div>
 
 </section>
 
+<script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
 
 <script>
+    document.querySelector(".deactivate").addEventListener("click",function(){
+    var userid = document.getElementById("userid")
+        var r = confirm("DO you want to delete your account permanently ");  
+    if (r == true) {  
+       axios.get(`/delete/${userid.value}`).then(function(res){
+        alert("account deleted successfully")
+        location.reload();
+       })
+    }
+    })
+   
     document.getElementById("profile-update").addEventListener("click",function(){
         document.getElementById("profile").click()
     })

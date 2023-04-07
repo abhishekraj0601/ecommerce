@@ -11,7 +11,6 @@ const nodemailer = require('../nodemailer');
 var multer = require("multer")
 var GoogleStrategy = require('passport-google-oidc');
 require('dotenv').config()
-var FacebookStrategy = require('passport-facebook');
 
 
 var LocalStrategy = require('passport-local');
@@ -19,6 +18,7 @@ passport.use(new LocalStrategy(userModel.authenticate()));
 
 const Razorpay = require('razorpay');
 // ----------------------------------------------------
+
 // ---------------------oauth---------------------------------
 
 router.get('/login/federated/google', passport.authenticate('google'));
@@ -29,13 +29,28 @@ passport.use(new GoogleStrategy({
   callbackURL: '/oauth2/redirect/google',
   scope: [ 'email','profile' ]
 }, function verify(issuer, profile, cb) {
- console.log(profile)
+ userModel.findOne({username:profile.emails[0].value}).then(function(user){
+  if(user){
+    return cb(null,user)
+  }else{
+    var data = new userModel({
+      username:profile.emails[0].value,
+      email:profile.emails[0].value,
+      fullname:profile.displayName
+     })
+     userModel.register(data, "1234").then(function(newuser){
+      return cb(null,newuser)
+     })
+  }
+ })
 }));
 router.get('/oauth2/redirect/google', passport.authenticate('google', {
   successRedirect: '/',
   failureRedirect: '/login'
 }));
+
 // ------------------------------------------------------------------------------------
+
 var instance = new Razorpay({
   key_id: 'rzp_test_kNNGbyOiNhCZYG',
   key_secret: 'gyCm1M4HZSoAZRBAj2MquIut',
@@ -154,11 +169,9 @@ router.get('/cart',isLoggedin, function(req, res, next) {
   })
   .then(async function(loginuser){
     const carts = await productModel.find({_id:loginuser.cart});
-// console.log(carts)
     // Sum up the cart prices using the reduce method
     const totalPrice = carts.reduce((acc, cart) => acc + cart.price, 0);
     res.render('cart', {user: req.user, isLoggedIn: req.isLogged,title:"cart" ,loginuser,totalPrice});
-    // console.log(totalPrice )
   })
 
 });
@@ -391,7 +404,6 @@ router.post("/sell",upload.array('filename', 5),function(req,res){
     }).then(function(product){
           res.redirect("back")
        })
-   
 })
 
 router.get("/sell/view/:id",function(req,res){

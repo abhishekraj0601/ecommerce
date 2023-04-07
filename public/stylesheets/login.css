@@ -62,16 +62,7 @@ body{
 #form button:active{
     opacity: .6;
 }
-.anchor a{
-    width: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    border-radius: 5px;
-    color: #fff;
-    height: 30px;
-}
+
 .forget{
     text-decoration: none;
     color: rgb(128, 128, 128);

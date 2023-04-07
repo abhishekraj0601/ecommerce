@@ -36,7 +36,6 @@ var userSchema = new mongoose.Schema({
     type:Array,
     default:[]
   },
- 
   expiringtime:String,
   otp:String,
   review:[{ type:mongoose.Schema.Types.ObjectId,ref:"review"}],

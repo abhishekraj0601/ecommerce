@@ -14,13 +14,28 @@ var app = express();
 app.use(session({
   secret:"secret",
   resave:false,
-  saveUninitialized:false
+  saveUninitialized:true,
+  cookie:{
+    maxAge:(24 * 60 * 60 * 1000) // 24hour
+  }
 }))
-
+app.use(passport.authenticate('session'));
 app.use(passport.initialize())
 app.use(passport.session())
 passport.serializeUser(usersRouter.serializeUser())
 passport.deserializeUser(usersRouter.deserializeUser())
+
+passport.serializeUser(function(user, cb) {
+  process.nextTick(function() {
+    cb(null, { id: user.id, username: user.username, fullname: user.fullname });
+  });
+});
+
+passport.deserializeUser(function(user, cb) {
+  process.nextTick(function() {
+    return cb(null, user);
+  });
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
