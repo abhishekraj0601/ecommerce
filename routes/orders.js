@@ -6,6 +6,7 @@ var orderSchema = mongoose.Schema({
         type:Array,
         default:[]
     },
+    price:String,
     paymentmode:String,
     paymentstatus:String,
     userotp:String,

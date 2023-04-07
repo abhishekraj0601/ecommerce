@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+</head>
+<body>
+    <section>
+
+        <div class="container py-5" >
+            <h1 style="text-align: center;">delivered order</h1>
+
+            <ol>
+               
+               
+                <%order.forEach((elem)=>{%>
+                    <% if(elem.deliverystatus !=='approved'){%>
+                <li>
+                    <div class="border p-3 mt-3 d-flex justify-content-between" style="border-radius: 10px;">
+                        <div class="d-flex gap-4">
+                            <img src="../images/uploads/<%=elem.productid[0].photo[0].filename%>" style="height: 150px;" alt="">
+                           <div>
+                                <h4><%=elem.address[0].username%></h4>
+                                <p class="m-0 text-danger"><%=elem.price%></p>
+                                <div class="d-flex gap-5 flex-wrap">
+                                    <p class="m-0 "><strong>address : </strong><%=elem.address[0].flate_no%>, <%=elem.address[0].area%>, <%=elem.address[0].city%>, <%=elem.address[0].state%>, <%=elem.address[0].country%></p>
+                                    <p class="m-0 mx-5"><strong>PinCode : </strong><%=elem.address[0].pincode%></p>
+                                </div>
+                                <p class="m-0"><strong>phone : </strong><a href="tel:+919039495825"><%=elem.address[0].number%></a></p>
+                                <div class="d-flex gap-5">
+                                    <p class="m-0"><strong>payment Mode :</strong> <%=elem.paymentmode%></p>
+                                    <p class="m-0 mx-5 <%= elem.paymentstatus == 'Success' ? 'text-success' : ' text-danger'%>"><strong class="text-dark">payment Status :</strong> <%=elem.paymentstatus%></p>
+                                </div>
+                                <p class="m-0"><strong>dilevery status :</strong> <%=elem.deliverystatus == 'approved' ? 'pending' : 'delivered'%></p>
+                           </div>
+                        </div>
+                        <%if(elem.deliverystatus !== "deliverd"){%>
+                            <div class="border">
+                                <form action="/userverify/<%=elem._id%>/<%=elem.userid[0]%>/<%=elem.productid[0]._id%>" method="post" class="mt-4 d-flex flex-column gap-2 px-3">
+                                    <input type="text" required name="orderotp" maxlength="6" minlength="6" placeholder="enter 6 digit otp">
+                                    <button class="btn btn-secondary">submit</button>
+                                    <button class="btn btn-link orderotp" type="button" >Resend Otp</button>
+
+                                </form>
+                            </div>
+                        <% }%>
+                    </div>
+                    
+                   
+                </li>
+                <% }%>
+               <% })%>
+            </ol>
+        </div>
+
+        <div class="container py-5" >
+            <h1 style="text-align: center;">ORDER REQUESTS</h1>
+
+            <ol>
+                <%order.forEach((elem)=>{%>
+                    <% if(elem.deliverystatus =='approved'){%>
+                <li>
+                    <a href="/sell/view/<%=elem._id%>">
+                        <div class="border p-3 mt-3 d-flex justify-content-between" style="border-radius: 10px;">
+                            <div class="d-flex gap-4">
+                                <img src="../images/uploads/<%=elem.productid[0].photo[0].filename%>" style="height: 150px;" alt="">
+                               <div>
+                                    <h4><%=elem.address[0].username%></h4>
+                                    <p class="m-0 text-danger"><%=elem.price%></p>
+                                    <div class="d-flex gap-5 flex-wrap">
+                                        <p class="m-0 "><strong>address : </strong><%=elem.address[0].flate_no%>, <%=elem.address[0].area%>, <%=elem.address[0].city%>, <%=elem.address[0].state%>, <%=elem.address[0].country%></p>
+                                        <p class="m-0 mx-5"><strong>PinCode : </strong><%=elem.address[0].pincode%></p>
+                                    </div>
+                                    <p class="m-0"><strong>phone : </strong><a href="tel:+919039495825"><%=elem.address[0].number%></a></p>
+                                    <div class="d-flex gap-5">
+                                        <p class="m-0"><strong>payment Mode :</strong> <%=elem.paymentmode%></p>
+                                        <p class="m-0 mx-5 <%= elem.paymentstatus == 'Success' ? 'text-success' : ' text-danger'%>"><strong class="text-dark">payment Status :</strong> <%=elem.paymentstatus%></p>
+                                    </div>
+                                    <p class="m-0"><strong>dilevery status :</strong> <%=elem.deliverystatus == 'approved' ? 'pending' : 'delivered'%></p>
+                               </div>
+                            </div>
+                            <%if(elem.deliverystatus !== "deliverd"){%>
+                                <div class="border">
+                                    <form action="/userverify/<%=elem._id%>/<%=elem.userid[0]%>/<%=elem.productid[0]._id%>" method="post" class="mt-4 d-flex flex-column gap-2 px-3">
+                                        <input type="text" required name="orderotp" maxlength="6" minlength="6" placeholder="enter 6 digit otp">
+                                        <button class="btn btn-secondary">submit</button>
+                                        <button class="btn btn-link orderotp" type="button" >Resend Otp</button>
+    
+                                    </form>
+                                </div>
+                            <% }%>
+                        </div>
+                    </a>
+                </li>
+                <% }%>
+               <% })%>
+            </ol>
+        </div>
+
+    </section>
+
+<script>
+    document.querySelector(".orderotp").addEventListener("click",function(){
+        var x = document.querySelector("#ema")
+        var y = document.querySelector("#ema1")
+        axios.get(`/orderotp/${x.value}/${y.value}`).then(function(res){
+            alert("otp sent successfully")
+        })
+    })
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+</body>
+</html>

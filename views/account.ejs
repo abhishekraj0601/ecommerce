@@ -110,12 +110,7 @@
                 <small class="mx-3 m-0 username-suggestion" style="position: absolute; font-size: 11px;display: none;">asdf</small>
 
             </div>
-            <div class="form-goup d-flex flex-column gap-3 mt-5">
-                <label for="name">Email</label>
-       
-                <input type="email" placeholder="Enter mobile number" name="email" id="" value="<%=user.email%>">
-        
-            </div>
+           
             <div class="form-goup d-flex flex-column gap-3 mt-5">
                 <label for="name">mobile number</label>
        
@@ -154,7 +149,6 @@
 
 </section>
 
-<script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
 
 <script>
     document.querySelector(".deactivate").addEventListener("click",function(){
@@ -182,11 +176,11 @@
             if (res.data == null) {
                 small.style.display="block"
                 small.style.color="green";
-                small.textContent = "this user name is available."
+                small.textContent = "user name available."
             }else{
                 small.style.display="block"
                 small.style.color="red";
-                small.textContent = "this user name is already taken."
+                small.textContent = " user name is already taken."
 
             }
         })

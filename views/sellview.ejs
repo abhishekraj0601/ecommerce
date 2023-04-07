@@ -11,43 +11,39 @@
 <body>
     <section>
         <div class="container py-5" >
-            <h1 style="text-align: center;">ORDER REQUESTS</h1>
-
-            <ol>
-                <%product.orderId.forEach((elem)=>{%>
-                <li>
                     <div class="border p-3 mt-3 d-flex justify-content-between" style="border-radius: 10px;">
                         <div>
-                            <h4><%=elem.address[0].username%></h4>
+                            <h4><%=product.address[0].username%></h4>
+                            <p class="text-danger"><%=product.price%></p>
                             <div class="d-flex gap-5 flex-wrap">
-                                <p class="m-0 "><strong>address : </strong><%=elem.address[0].flate_no%>, <%=elem.address[0].area%>, <%=elem.address[0].city%>, <%=elem.address[0].state%>, <%=elem.address[0].country%></p>
-                                <p class="m-0 mx-5"><strong>PinCode : </strong><%=elem.address[0].pincode%></p>
+                                <p class="m-0 "><strong>address : </strong><%=product.address[0].flate_no%>, <%=product.address[0].area%>, <%=product.address[0].city%>, <%=product.address[0].state%>, <%=product.address[0].country%></p>
+                                <p class="m-0 mx-5"><strong>PinCode : </strong><%=product.address[0].pincode%></p>
                             </div>
-                            <p class="m-0"><strong>phone : </strong><a href="tel:+919039495825"><%=elem.address[0].number%></a></p>
+                            <p class="m-0"><strong>phone : </strong><a href="tel:+919039495825"><%=product.address[0].number%></a></p>
                             <div class="d-flex gap-5">
-                                <p class="m-0"><strong>payment Mode :</strong> <%=elem.paymentmode%></p>
-                                <p class="m-0 mx-5 <%= elem.paymentstatus == 'Success' ? 'text-success' : ' text-danger'%>"><strong class="text-dark">payment Status :</strong> <%=elem.paymentstatus%></p>
+                                <p class="m-0"><strong>payment Mode :</strong> <%=product.paymentmode%></p>
+                                <p class="m-0 mx-5 <%=product.paymentstatus == 'Success' ? 'text-success' : ' text-danger'%>"><strong class="text-dark">payment Status :</strong> <%=product.paymentstatus%></p>
                             </div>
-                            <p class="m-0"><strong>dilevery status :</strong> <%=elem.deliverystatus == 'approved' ? 'pending' : 'delivered'%></p>
+                            <p class="m-0"><strong>dilevery status :</strong> <%=product.deliverystatus == 'approved' ? 'pending' : 'delivered'%></p>
                         </div>
-                        <%if(elem.deliverystatus !== "deliverd"){%>
                             <div class="border">
-                                <form action="/userverify/<%=elem._id%>/<%=elem.userid[0]._id%>/<%=product._id%>" method="post" class="mt-4 d-flex flex-column gap-2 px-3">
+                                <form action="/userverify/<%=product._id%>/<%=product.userid[0]%>/<%=product.productid[0]._id%>" method="post" class="mt-4 d-flex flex-column gap-2 px-3">
                                     <input type="text" required name="orderotp" maxlength="6" minlength="6" placeholder="enter 6 digit otp">
                                     <button class="btn btn-secondary">submit</button>
                                     <button class="btn btn-link orderotp" type="button" >Resend Otp</button>
 
                                 </form>
                             </div>
-                        <% }%>
                     </div>
-                </li>
-                <input type="text" name="" id="ema1" value="<%=elem.userid[0]._id%>" style="display: none;">
 
-                <input type="text" name="" id="ema" value="<%=elem._id%>" style="display: none;">
-               <% })%>
-            </ol>
+                <input type="text" name="" id="ema1" value="<%=product.userid[0]%>" style="display: none;">
+                <input type="text" name="" id="ema" value="<%=product._id%>" style="display: none;">
+
         </div>
+<%=product%>
+<%=product._id%>
+<%=product.userid[0]%>
+<%=product.productid[0]._id%>
 
     </section>
 

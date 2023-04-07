@@ -35,7 +35,6 @@ passport.use(new GoogleStrategy({
   }else{
     var data = new userModel({
       username:profile.emails[0].value,
-      email:profile.emails[0].value,
       fullname:profile.displayName
      })
      userModel.register(data, "1234").then(function(newuser){
@@ -126,18 +125,11 @@ router.get("/buy",isLoggedin ,function(req,res){
   res.redirect("back")
 })
 // ------------------axios
-router.get("/checkusername/:username",async function(req,res){
- var user = await userModel.findOne({username:req.params.username})
-res.json(user)
-})
+
 router.get("/check/:username",async function(req,res){
  var user = await userModel.findOne({$or:[{"username":req.params.username},{"email":req.params.username},{"number":req.params.username}]})
 res.json(user)
 })
-router.get("/checkemail/:email",async function(req,res){
-  var user = await userModel.findOne({email:req.params.email})
- res.json(user)
- })
 
 //  -------------------------------------
 router.get('/account',isLoggedin, function(req, res, next) {
@@ -225,32 +217,33 @@ router.post("/userverify/:orderid/:userid/:productid",async function(req,res){
     order.deliverystatus ="deliverd";
     order.paymentstatus ="Success"
     await order.save()
-    res.redirect("back")
+    res.redirect("/orderlist")
   }else{
     res.send("not match")
   }
 })
 
-router.post("/buy/:id",isLoggedin,function(req,res,next){
-  userModel.findOne({username:req.session.passport.user}).then(function(loginuser){
-    var address = {
-      place:req.body.place,
-      flate_no:req.body.flate,
-      area:req.body.area,
-      city:req.body.city,
-      state:req.body.state,
-      username:req.body.username,
-      country:req.body.country,
-      pincode:req.body.pincode,
-      number:req.body.number
-    }
+router.post("/buy/:id",isLoggedin,async function(req,res,next){
+  var loginuser = await userModel.findOne({username:req.session.passport.user})
+  var product = await productModel.findOne({_id:req.params.id})
+  var address = {
+    place:req.body.place,
+    flate_no:req.body.flate,
+    area:req.body.area,
+    city:req.body.city,
+    state:req.body.state,
+    username:req.body.username,
+    country:req.body.country,
+    pincode:req.body.pincode,
+    number:req.body.number
+  }
     orderModel.create({
+    price:product.price,
     paymentmode:req.body.paymentType,
     productid:req.params.id,
     userid:loginuser._id
   }).then(async function(order){
     var x =Math.random().toString().substr(2, 6); //6digit otp
-    var product = await productModel.findOne({_id:req.params.id})
     if(req.body.paymentType === "cod"){
       order.paymentstatus ="Pending"
     }else{
@@ -265,7 +258,7 @@ router.post("/buy/:id",isLoggedin,function(req,res,next){
     await order.save()
     await product.save()
     await loginuser.save()
-    var email = loginuser.email;
+    var email = loginuser.username;
     var html = `<p><strong>congratulation your order with </strong></p> <h5>ORDER ID : ${order._id}</h5>
     <p>has been confirmed <br> please note down otp and confirm at the time of delivey <strong>${x}</strong></p>
     `;
@@ -274,7 +267,7 @@ router.post("/buy/:id",isLoggedin,function(req,res,next){
     nodemailer(email,subject,html).then(function(){
       res.redirect("/order")
     })
-  })
+
   })
 })
 
@@ -407,14 +400,20 @@ router.post("/sell",upload.array('filename', 5),function(req,res){
 })
 
 router.get("/sell/view/:id",function(req,res){
-  productModel.findOne({_id:req.params.id}).populate({
-    path:"orderId",
-    populate: {
-      path: "userid" // in blogs, populate comments
-  }
+  orderModel.findOne({_id:req.params.id}).populate({
+    path:"productid"
   }).then(function(product){
     res.render("sellview",{product})
   })
+})
+
+router.get("/orderlist",async function(req,res){
+var product = await productModel.find()
+orderModel.find().populate({
+  path:"productid"
+}).then(function(order){
+  res.render("orderlist" ,{order ,product,title:"orderlist"})
+})
 })
 
 // ------------------------------------------------
@@ -436,7 +435,7 @@ router.post("/updatephoto",upload.single('filename'),function(req,res){
 })
 
 router.post("/updateuser",isLoggedin,function(req,res){
-  userModel.findOneAndUpdate({username:req.session.passport.user},{fullname:req.body.fullname ,username:req.body.username , email:req.body.email , mobilenumber:req.body.number , gender:req.body.gender}).then(function(){
+  userModel.findOneAndUpdate({username:req.session.passport.user},{fullname:req.body.fullname ,username:req.body.username , mobilenumber:req.body.number , gender:req.body.gender}).then(function(){
     res.redirect("back")
   })
 })
@@ -468,14 +467,14 @@ router.post("/changepassword",function(req,res){
 })
 
 router.post("/forget",async function(req,res){
-  var user = await userModel.findOne({$or:[{"mobilenumber":req.body.email},{"email":req.body.email}]})
+  var user = await userModel.findOne({$or:[{"mobilenumber":req.body.email},{"username":req.body.email}]})
   if(user){
     var x =Math.random().toString().substr(2, 6); //6digit otp
     user.otp = x;
     user.expiringtime = Date.now() + 300000;  //5mint
     await user.save()
     // --------nodemailer file
-    var email = user.email;
+    var email = user.username;
     var subject = "password change request"
     var html = ` <p>  Please fill the following otp to reset your password.</p><h2> ${x} </h2>
     this link is valid only for 5 minuts.
@@ -517,7 +516,7 @@ router.get("/resendotp/:userid",async function(req,res) {
     user.expiringtime = Date.now() + 300000;  //5mint
     await user.save()
     // --------nodemailer file
-    var email = user.email;
+    var email = user.username;
     var html = ` <p>  Please fill the following otp to reset your password.</p><h2> ${x} </h2>
     this link is valid only for 5 minuts.
     If you did not request this, please ignore this email and your password will remain unchanged `;
@@ -534,7 +533,7 @@ router.get("/orderotp/:orderid/:userid",async function(req,res) {
     order.userotp = x;
     await order.save()
     // --------nodemailer file
-    var email = user.email;
+    var email = user.username;
     var html = ` <p> order cnfermation otp is </p><h2> ${x} </h2>`;
     var subject = "order verification otp"
     // -------
@@ -552,7 +551,6 @@ router.post("/register",async function(req,res){
   }else{
  var data = new userModel({
     username:req.body.username,
-    email:req.body.email,
     fullname:req.body.fullname,
   })
   if (!req.body.password) {
