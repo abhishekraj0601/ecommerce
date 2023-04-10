@@ -1,5 +1,4 @@
 <%- include('partials/header.ejs') %>
-<section style="height: 80px; background: royalblue;"></section>
 <section id="account">
   <div class="account-left ">
     <div class="profile d-flex bg-white p-2 gap-3 align-items-center" >
@@ -149,19 +148,107 @@
 
 </section>
 
+<section id="feedbackform" class=" align-items-center justify-content-center" style="z-index: 9999; display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.507);">
+    <div class="feedback px-5 py-3 border bg-white" style="border-radius: 10px;">
+        <strong >If you have a moment,please let us know why are you deactivating:</strong>
+        <form action="/deactivateaccount" method="post" class="d-flex flex-column mt-3 gap-1 deactivation-form">
+            <div class="form-check">
+                <input class="form-check-input" value="i found a better platform." type="radio" name="reasion" id="flexRadioDefault1">
+                <label class="form-check-label" for="flexRadioDefault1">
+                    i found a better platform.
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" value="its not what i was looking for." type="radio" name="reasion" id="flexRadioDefault2">
+                <label class="form-check-label" for="flexRadioDefault2">
+                    its not what i was looking for.
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" value="website dont work as expected" type="radio" name="reasion" id="flexRadioDefault1">
+                <label class="form-check-label" for="flexRadioDefault1">
+                    website dont work as expected
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" value="temporary deavtivation" type="radio" name="reasion" id="flexRadioDefault2" >
+                <label class="form-check-label" for="flexRadioDefault2">
+                    its a temporary deavtivation - i am troubleshooting an issue
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" value="other" type="radio" name="reasion" id="flexRadioDefault2" >
+                <label class="form-check-label" for="flexRadioDefault2">
+                    other
+                </label>
+            </div>
+            <div class="d-flex flex-column mt-2">
+                <strong>kindly tell us the reasion so we can inprove.</strong>
+                <textarea name="textarea" id="" class="p-1 border bg-light" style="resize: none;" placeholder="Enter Your Feedback"></textarea>
+            </div>
+            <div class="otp mt-4 flex-column gap-2" style="display: none;" >
+                <strong>Enter your otp</strong>
+               <div class="d-flex gap-3">
+                <input type="text" name="otp" class="otpinput p-1 bg-light w-50 border" placeholder="Enter otp here" maxlength="6">
+                <button class="btn btn-link otpbtn" type="button"  >SEND OTP</button>
+               </div>
+            </div>
+            <div class="mt-4 d-flex  gap-2 justify-content-end account-btn">
+                <button class="btn btn-warning text-white closebtn" type="button">cencle</button>
+                <button class="btn btn-info text-white nextbtn" type="button">next</button>
+                <button class="btn btn-danger" type="submit" style="display: none;" >Deactivate now</button>
+            </div>
+        </form>
+    </div>
+</section>
+
 
 <script>
-    document.querySelector(".deactivate").addEventListener("click",function(){
-    var userid = document.getElementById("userid")
-        var r = confirm("DO you want to delete your account permanently ");  
-    if (r == true) {  
-       axios.get(`/delete/${userid.value}`).then(function(res){
-        alert("account deleted successfully")
-        location.reload();
-       })
-    }
+    document.querySelector(".otpbtn").addEventListener("click",function(){
+        document.querySelector(".otpbtn").textContent="Please Wait !"
+        document.querySelector(".otpbtn").disabled = true
+        axios.get(`/deactivate`).then(function(res){
+            document.querySelector(".otpbtn").textContent="Otp Sent Successfully." ;
+            var timeleft = 10;
+             var downloadTimer = setInterval(function(){
+            if(timeleft <= 0){
+                clearInterval(downloadTimer);
+                document.querySelector(".otpbtn").textContent="RESEND OTP";
+                document.querySelector(".otpbtn").disabled = false;
+            }else{
+                document.querySelector(".otpbtn").textContent="RESEND OTP IN : " + timeleft;
+            }
+            timeleft -= 1;
+                }, 1000);  
+        })
     })
-   
+
+  var form = document.querySelector(".deactivation-form")
+    form.addEventListener("submit",event=>{
+        event.preventDefault()
+        var x = document.querySelector("input[name=otp]")
+        if (x.value.trim().length >= 6) {
+            form.submit()
+        }else{
+            alert("please fill 6 digit otp")
+        }
+    })
+    
+    document.querySelector(".nextbtn").addEventListener("click",function(){
+        document.querySelector("button[type=submit]").style.display="block"
+        document.querySelector(".nextbtn").style.display="none"
+        document.querySelector(".otp").style.display="flex"
+    })
+    var feedback =  document.getElementById("feedbackform")
+
+    document.querySelector(".deactivate").addEventListener("click",function(){
+        feedback.style.display="flex"
+    })
+
+    document.querySelector(".closebtn").addEventListener("click",function(){
+        feedback.style.display="none"
+    })
+
     document.getElementById("profile-update").addEventListener("click",function(){
         document.getElementById("profile").click()
     })
@@ -181,7 +268,6 @@
                 small.style.display="block"
                 small.style.color="red";
                 small.textContent = " user name is already taken."
-
             }
         })
       })

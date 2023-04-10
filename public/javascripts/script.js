@@ -19,10 +19,10 @@ window.onscroll = () => {
       // nav.style.boxShadow=" 0px 2px 1px 0px #f2f2ff";
       nav.style.position="fixed";
     } else {
-      nav.style.background="transparent";
+      nav.style.background="royalblue";
       nav.style.position="absolute";
       nav.style.boxShadow="none";
-    }
+    } 
   };
 
   var list = document.querySelectorAll(".list")

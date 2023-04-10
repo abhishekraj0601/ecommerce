@@ -1,7 +1,6 @@
 <%- include('partials/header.ejs') %>
-<section style="height: 80px; background: royalblue;"></section>
 
-<section id="order" style="width: 100%; min-height: 90vh;  background-color: #ececec;">
+<section id="order" style="width: 100%; min-height: 90vh;  background-color: #ececec; padding-top: 90px;">
    <% if(loginuser.buyed.length >0){%>
     <div class="container bg-white p-0 order">
         <%loginuser.buyed.forEach(function(elem){%>

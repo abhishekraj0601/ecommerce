@@ -1,12 +1,11 @@
 
-body{
-    text-transform: capitalize;
-}
+
 #form{
+
     width: 100%;
     position: relative;
     height: auto;
-    padding: 50px 0;
+    padding: 130px 0 50px 0;
     display: flex;
     align-items: center;
     justify-content: center;

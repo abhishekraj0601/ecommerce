@@ -23,7 +23,8 @@ nav {
   height: 80px;
   top: 0;
   width: 100%;
-  background:transparent ;
+  background: royalblue;
+  /* background:transparent ; */
   border-radius:0 0 20px 20px;
 }
 nav i{
@@ -89,7 +90,7 @@ nav .container1 ul li a {
   background-color: #ececec;
   gap: 10px;
   width: 100%;
-  padding: 10px 5%;
+  padding: 90px 5% 10px 5%;
 }
 
 .account-left{
@@ -114,6 +115,8 @@ nav .container1 ul li a {
   font-size: 13px;
   font-weight: 500;
 }
+
+
 /* ------------------------ */
 
 #home{

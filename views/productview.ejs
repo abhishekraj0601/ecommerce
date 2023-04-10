@@ -1,5 +1,4 @@
 <%- include('partials/header.ejs') %>
-<section style="height: 80px; background-color: royalblue;"></section>
 <section id="productview" >
     <div class=" productview d-flex">
         <div class="productview-left">
@@ -209,8 +208,12 @@ form.addEventListener('submit', event => {
   if (paymentType === 'online') {
   } else {
     // Submit form normally
-
-    form.submit();
+    var r = confirm("confirm this order")
+    if (r == true) {
+      form.submit();
+      alert("PLEASE WAIT ! DONT CLOSE THE WINDOW")
+    }
+    
   }
 });
 
@@ -277,11 +280,6 @@ $.ajax(settings).done((req,res)=>{
     // alert("Payment successful PLEASE WAIT ! Please do not refress the page");
     document.getElementById("paymentdiv").style.display="flex"
     document.getElementById("flexRadioDefault1").disabled = true;  
-    // document.querySelector(".success-animation").style.display="flex";
-    // document.getElementById("rzp-button1").textContent ="PLEASE WAIT";
-    // document.getElementById("rzp-button1").disabled = true;
-    // document.getElementById("rzp-button1").classList.add("btn-warning")
-    // document.getElementById("rzp-button1").classList.remove("btn-primary")
     form.submit();
   }else{
     alert("payment failed")

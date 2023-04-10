@@ -8,6 +8,7 @@ var session = require("express-session")
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const passport = require('passport');
+const MongoStore = require('connect-mongo');
 
 
 var app = express();
@@ -17,7 +18,13 @@ app.use(session({
   saveUninitialized:true,
   cookie:{
     maxAge:(24 * 60 * 60 * 1000) // 24hour
-  }
+  },
+  store:MongoStore.create({
+    mongoUrl:'mongodb+srv://abhishekraj8685:EAde5oz8rHaKpYIP@cluster0.kggti8m.mongodb.net/user?retryWrites=true&w=majority',
+    autoRemove:'disabled'
+  },function(err){
+    console.log(err)
+  })
 }))
 app.use(passport.authenticate('session'));
 app.use(passport.initialize())

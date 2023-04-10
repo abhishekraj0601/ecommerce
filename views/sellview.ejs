@@ -40,10 +40,7 @@
                 <input type="text" name="" id="ema" value="<%=product._id%>" style="display: none;">
 
         </div>
-<%=product%>
-<%=product._id%>
-<%=product.userid[0]%>
-<%=product.productid[0]._id%>
+
 
     </section>
 
@@ -51,8 +48,21 @@
     document.querySelector(".orderotp").addEventListener("click",function(){
         var x = document.querySelector("#ema")
         var y = document.querySelector("#ema1")
+        document.querySelector(".orderotp").textContent="Please Wait!"
+        document.querySelector(".orderotp").disabled = true
         axios.get(`/orderotp/${x.value}/${y.value}`).then(function(res){
-            alert("otp sent successfully")
+            document.querySelector(".orderotp").textContent="OTP Sent Successfuly"
+            var timeleft = 10;
+             var downloadTimer = setInterval(function(){
+                if(timeleft <= 0){
+                    clearInterval(downloadTimer);
+                    document.querySelector(".orderotp").textContent="RESEND OTP"
+                    document.querySelector(".orderotp").disabled = false
+                }else{
+                    document.querySelector(".orderotp").textContent="RESEND OTP IN : " + timeleft
+                }
+            timeleft -= 1;
+            }, 1000);
         })
     })
 </script>

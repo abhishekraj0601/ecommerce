@@ -8,15 +8,12 @@ var orderModel = require("./orders")
 var productModel = require("./product")
 var reviewModel = require("./review")
 const nodemailer = require('../nodemailer');
-var multer = require("multer")
-var GoogleStrategy = require('passport-google-oidc');
-require('dotenv').config()
-
-
-var LocalStrategy = require('passport-local');
-passport.use(new LocalStrategy(userModel.authenticate()));
-
 const Razorpay = require('razorpay');
+var multer = require("multer")
+require('dotenv').config()
+var LocalStrategy = require('passport-local');
+var GoogleStrategy = require('passport-google-oidc');
+passport.use(new LocalStrategy(userModel.authenticate()));
 // ----------------------------------------------------
 
 // ---------------------oauth---------------------------------
@@ -48,7 +45,7 @@ router.get('/oauth2/redirect/google', passport.authenticate('google', {
   failureRedirect: '/login'
 }));
 
-// ------------------------------------------------------------------------------------
+// ---------------------------------razor pay---------------------------------------------------
 
 var instance = new Razorpay({
   key_id: 'rzp_test_kNNGbyOiNhCZYG',
@@ -89,6 +86,7 @@ router.post("/api/payment/verify",(req,res)=>{
 // ---------------------------------------------------
 
 
+
 // -multer---------
 
 const storage = multer.diskStorage({
@@ -121,6 +119,7 @@ router.get('/', function(req, res, next) {
       res.render('index', {user: req.user, isLoggedIn: req.isLogged ,product ,title:"home"});
   })
 });
+
 router.get("/buy",isLoggedin ,function(req,res){
   res.redirect("back")
 })
@@ -135,7 +134,7 @@ res.json(user)
 router.get('/account',isLoggedin, function(req, res, next) {
   userModel.findOne({username:req.session.passport.user}).then(function(loginuser){
     res.render('account', {user: req.user, isLoggedIn: req.isLogged,title:"account" ,loginuser});
-  })});
+})});
 
 router.get('/contact', function(req, res, next) {
   res.render('contact', {user: req.user, isLoggedIn: req.isLogged ,title:"contact"});
@@ -253,15 +252,16 @@ router.post("/buy/:id",isLoggedin,async function(req,res,next){
     order.userotp =x
     product.orderId.push(order._id)
     order.address.push(address)
-    loginuser.address.push(address)
     loginuser.buyed.push(order._id)
     await order.save()
     await product.save()
     await loginuser.save()
     var email = loginuser.username;
-    var html = `<p><strong>congratulation your order with </strong></p> <h5>ORDER ID : ${order._id}</h5>
-    <p>has been confirmed <br> please note down otp and confirm at the time of delivey <strong>${x}</strong></p>
-    `;
+    var html = `<p><strong>congratulation your order with </strong> <h4>ORDER ID : ${order._id}</h4>
+    <h3>product : ${product.productname}</h3>
+    <h3> Price : ${product.price}</h3>
+    has been confirmed. please note down otp <strong>${x}</strong>. <br> and confirm at the time of delivey <br><br> <strong>Thank you </strong>
+    </p> `;
     var subject = "order confirmation"
     // -------
     nodemailer(email,subject,html).then(function(){
@@ -318,6 +318,7 @@ router.get('/smartphone',async function(req, res, next) {
   var computer = await productModel.find({category:"computer"})
     res.render('shop', {user: req.user, isLoggedIn: req.isLogged,search ,smartphone,laptop,computer,product,title:"smartphones"});
 });
+
 router.get('/laptop',async function(req, res, next) {
   var search = await productModel.find()
 
@@ -327,6 +328,7 @@ router.get('/laptop',async function(req, res, next) {
   var computer = await productModel.find({category:"computer"})
     res.render('shop', {user: req.user, isLoggedIn: req.isLogged,search ,smartphone,laptop,computer,product,title:"laptops"});
 });
+
 router.get('/computer',async function(req, res, next) {
   var search = await productModel.find()
 
@@ -349,11 +351,13 @@ router.get("/reado",function(req,res){
     res.send(user)
   })
 })
+
 router.get("/readr",function(req,res){
   reviewModel.find().then(function(user){
     res.send(user)
   })
 })
+
 router.get("/readp",function(req,res){
   productModel.find().then(function(user){
     res.send(user)
@@ -408,12 +412,9 @@ router.get("/sell/view/:id",function(req,res){
 })
 
 router.get("/orderlist",async function(req,res){
-var product = await productModel.find()
-orderModel.find().populate({
-  path:"productid"
-}).then(function(order){
-  res.render("orderlist" ,{order ,product,title:"orderlist"})
-})
+var orderlist = await orderModel.find({deliverystatus:"approved"}).populate({path:"productid"})
+var deliverdlist = await orderModel.find({deliverystatus:"deliverd"}).populate({path:"productid"})
+res.render("orderlist",{orderlist ,deliverdlist})
 })
 
 // ------------------------------------------------
@@ -508,6 +509,7 @@ router.post("/forget/:id",async function(req,res){
    }
   }
 })
+
 router.get("/resendotp/:userid",async function(req,res) {
   var user = await userModel.findOne({_id:req.params.userid})
  
@@ -526,15 +528,19 @@ router.get("/resendotp/:userid",async function(req,res) {
       res.json("otp sent")
     })
 })
+
 router.get("/orderotp/:orderid/:userid",async function(req,res) {
   var order = await orderModel.findOne({_id:req.params.orderid})
+  var product = await productModel.findOne({_id:order.productid[0]})
  var user = await userModel.findOne({_id:req.params.userid})
     var x =Math.random().toString().substr(2, 6); //6digit otp
     order.userotp = x;
     await order.save()
     // --------nodemailer file
     var email = user.username;
-    var html = ` <p> order cnfermation otp is </p><h2> ${x} </h2>`;
+    var html = ` <p>The verification otp for Your order </p><strong> ${order._id} </strong>
+      <P> <strong>${product.productname }</strong>  <br> your otp is : <h2>${x}</h2></p>
+    `;
     var subject = "order verification otp"
     // -------
     nodemailer(email,subject,html).then(function(){
@@ -594,11 +600,34 @@ router.get('/logout', function(req, res, next){
 
 // ----------------------
 
-router.get("/delete/:userid",async function(req,res){
- var review = await reviewModel.deleteMany({userid:req.params.userid})
- var order = await orderModel.deleteMany({userid:req.params.userid})
- var user =await userModel.findOneAndDelete({username:req.session.passport.user})
- res.redirect("back")
+router.post("/deactivateaccount",async function(req,res){
+ var loginuser = await userModel.findOne({username:req.session.passport.user})
+
+ if(loginuser.otp !== req.body.otp){
+  res.send("otp not matched")
+ }else{
+   if (loginuser.expiringtime > Date.now()) {
+    var review = await reviewModel.deleteMany({userid:req.params.userid})
+   var order = await orderModel.deleteMany({userid:req.params.userid})
+   var user =await userModel.findOneAndDelete({username:req.session.passport.user})
+   if(req.body.lenght >0){
+   var email = "codecrushers01@gmail.com"
+   var subject = "deactivaion review"
+   var html =`<p><strong>Reason</strong> ${req.body.reasion} <br> 
+   <strong>other</strong> ${req.body.textarea}
+   </p>`
+   nodemailer(email,subject,html).then(function(){
+     res.redirect("back")
+   })
+   }else{
+    res.redirect("back")
+
+   }
+   }else{
+    res.send("otp expired")
+   }
+ }
+
 })
 
 router.get("/deleteorder/:orderid/:productid",async function(req,res){
@@ -610,7 +639,11 @@ user.buyed.splice(user.buyed.indexOf(req.params.orderid),1)
 await user.save()
 await product.save()
 var email = "codecrushers01@gmail.com";
-var html = ` <h5>ORDER ID : ${req.params.id}</h5>`;
+var html = ` <p><h5>ORDER ID : ${req.params.orderid}</h5> 
+  <h3>product : ${product.productname}</h3>
+  <h3>price: ${product.price}</h3>
+  has been cencled.
+</p>`;
 var subject = "order cencle"
 // -------
 nodemailer(email,subject,html).then(function(){
@@ -624,13 +657,14 @@ router.get("/reviewdelete/:productid/:id",async function(req,res){
   var user = await userModel.findOne({username:req.session.passport.user})
  var review = await reviewModel.findOneAndDelete({_id:req.params.id})
  var product =await productModel.findOne({_id:req.params.productid})
-product.reviewid.splice(product.reviewid.indexOf(req.params.id),1)
-user.review.splice(user.review.indexOf(req.params.id),1)
+ product.reviewid.splice(product.reviewid.indexOf(req.params.id),1)
+ user.review.splice(user.review.indexOf(req.params.id),1)
 
 await product.save()
 await user.save()
 res.redirect("back")
 })
+
 router.get("/productdelete/:id",async function(req,res){
   var order = await orderModel.find({productid:req.params.id})
   var user = await userModel.find({buyed:order._id})
@@ -684,7 +718,20 @@ reviewModel.create({
 })
 })
 
-
+router.get("/deactivate",async function(req,res){
+  var user =await userModel.findOne({username:req.session.passport.user})
+  var x =Math.random().toString().substr(2, 6); //6digit otp
+  user.expiringtime = Date.now() + 300000;  //5mint
+  user.otp = x
+  await user.save()
+  var email = user.username
+  var subject = "account deactivation request"
+  var html =`<p> your account deactivaion otp is <strong>${x}</strong>
+  kindly fill this otp to deactivate your account .if you are not requested for this please ignore this email and your account remain activated</p>`
+  nodemailer(email,subject,html).then(function(){
+    res.json(user)
+  })
+})
 // -----------------midelware-------------------
 
 function isLoggedin(req,res,next){
